@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  minio:
+    image: minio/minio:latest
+    pull_policy: build
+    restart: unless-stopped
+    hostname: minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio-data:/data
+    networks:
+      - minio-net
+    expose: 
+      - "9000:9000"
+    ports:
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    labels:
+      - "traefik.enable=true"
+      
+      # Routing for image retrieval (GET requests)
+      - "traefik.http.routers.minio.rule=Host(`cdn.dennishilhorst.nl`)"
+      - "traefik.http.routers.minio.entrypoints=websecure"
+      - "traefik.http.routers.minio.middlewares=block-uploads@docker"
+      - "traefik.http.services.minio.loadbalancer.server.port=9000"
+
+      # Middleware to block PUT requests (image uploads)
+      - "traefik.http.middlewares.block-uploads.chain.middlewares=block-put,block-post"
+      - "traefik.http.middlewares.block-put.headers.customRequestHeaders.X-Blocked-Method=PUT"
+      - "traefik.http.middlewares.block-put.headers.customResponseHeaders.X-Content-Type-Options=nocontent"
+      - "traefik.http.middlewares.block-put.headers.customFrameOptions=SAMEORIGIN"
+      - "traefik.http.middlewares.block-put.headers.customBrowserXSSFilter=true"
+      - "traefik.http.middlewares.block-put.headers.customContentSecurityPolicy=default-src 'self'"
+      - "traefik.http.middlewares.block-put.headers.customReferrerPolicy=same-origin"
+      - "traefik.http.middlewares.block-put.headers.customPermissionsPolicy=interest-cohort=()"
+      - "traefik.http.middlewares.block-put.headers.customFeaturePolicy=same-origin"
+      - "traefik.http.middlewares.block-put.headers.customStrictTransportSecurity=max-age=63072000; includeSubDomains; preload"
+
+      # Middleware to block POST requests (image uploads)
+      - "traefik.http.middlewares.block-post.headers.customRequestHeaders.X-Blocked-Method=POST"
+      - "traefik.http.middlewares.block-post.headers.customResponseHeaders.X-Content-Type-Options=nocontent"
+      - "traefik.http.middlewares.block-post.headers.customFrameOptions=SAMEORIGIN"
+      - "traefik.http.middlewares.block-post.headers.customBrowserXSSFilter=true"
+      - "traefik.http.middlewares.block-post.headers.customContentSecurityPolicy=default-src 'self'"
+      - "traefik.http.middlewares.block-post.headers.customReferrerPolicy=same-origin"
+      - "traefik.http.middlewares.block-post.headers.customPermissionsPolicy=interest-cohort=()"
+      - "traefik.http.middlewares.block-post.headers.customFeaturePolicy=same-origin"
+      - "traefik.http.middlewares.block-post.headers.customStrictTransportSecurity=max-age=63072000; includeSubDomains; preload"
+
+      # Routing for MinIO console
+      - "traefik.http.routers.minio-console.rule=Host(`cdn.console.dennishilhorst.nl`)"
+      - "traefik.http.routers.minio-console.entrypoints=websecure"
+      - "traefik.http.routers.minio-console.certresolver=myresolver"
+      - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
+volumes:
+  minio-data:
+networks:
+  minio-net:
+    name: minio-net
+    driver: bridge
