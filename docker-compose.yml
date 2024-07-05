@@ -12,9 +12,8 @@ services:
       - minio-data:/data
     networks:
       - minio-net
-    expose: 
-      - "9000:9000"
     ports:
+      - "9000:9000"
       - "9001:9001"
     command: server /data --console-address ":9001"
     labels:
@@ -53,7 +52,7 @@ services:
       # Routing for MinIO console
       - "traefik.http.routers.minio-console.rule=Host(`cdn.console.dennishilhorst.nl`)"
       - "traefik.http.routers.minio-console.entrypoints=websecure"
-      - "traefik.http.routers.minio-console.certresolver=myresolver"
+      - "traefik.http.routers.minio-console.tls.certresolver=myresolver"
       - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
 volumes:
   minio-data:
