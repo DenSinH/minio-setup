@@ -24,6 +24,9 @@ services:
       - "traefik.http.routers.minio.tls.certresolver=myresolver"
       - "traefik.http.services.minio.loadbalancer.server.port=9000"
 
+      # Middleware to block PUT and POST requests (image uploads)
+      - "traefik.http.middlewares.block-uploads.chain.middlewares=block-put,block-post"
+      
       # Middleware to block PUT requests (image uploads)
       - "traefik.http.middlewares.block-put.headers.customRequestHeaders.X-Blocked-Method=PUT"
       - "traefik.http.middlewares.block-put.headers.customResponseHeaders.X-Content-Type-Options=nocontent"
