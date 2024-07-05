@@ -17,43 +17,12 @@ services:
       - "traefik.enable=true"
       
       # Routing for image retrieval (GET requests)
-      - "traefik.http.routers.minio.rule=Host(`cdn.dennishilhorst.nl`)"
+      - "traefik.http.routers.minio.rule=Host(`cdn.dennishilhorst.nl`) && Method(`GET`)"
       - "traefik.http.routers.minio.middlewares=block-uploads@docker"
       - "traefik.http.routers.minio.entrypoints=websecure"
       - "traefik.http.routers.minio.service=minio"
       - "traefik.http.routers.minio.tls.certresolver=myresolver"
       - "traefik.http.services.minio.loadbalancer.server.port=9000"
-
-      # Middleware to block PUT and POST requests (image uploads)
-      - "traefik.http.middlewares.block-uploads.chain.middlewares=block-put,block-post"
-      
-      # Middleware to block PUT requests (image uploads)
-      - "traefik.http.middlewares.block-put.headers.customRequestHeaders.X-Blocked-Method=PUT"
-      - "traefik.http.middlewares.block-put.headers.customResponseHeaders.X-Content-Type-Options=nocontent"
-      - "traefik.http.middlewares.block-put.headers.frameDeny=true"
-      - "traefik.http.middlewares.block-put.headers.browserXssFilter=true"
-      - "traefik.http.middlewares.block-put.headers.contentSecurityPolicy=default-src 'self'"
-      - "traefik.http.middlewares.block-put.headers.referrerPolicy=same-origin"
-      - "traefik.http.middlewares.block-put.headers.permissionsPolicy=interest-cohort=()"
-      - "traefik.http.middlewares.block-put.headers.featurePolicy=same-origin"
-      - "traefik.http.middlewares.block-put.headers.sslRedirect=true"
-      - "traefik.http.middlewares.block-put.headers.stsSeconds=63072000"
-      - "traefik.http.middlewares.block-put.headers.stsIncludeSubdomains=true"
-      - "traefik.http.middlewares.block-put.headers.stsPreload=true"
-
-      # Middleware to block POST requests (image uploads)
-      - "traefik.http.middlewares.block-post.headers.customRequestHeaders.X-Blocked-Method=POST"
-      - "traefik.http.middlewares.block-post.headers.customResponseHeaders.X-Content-Type-Options=nocontent"
-      - "traefik.http.middlewares.block-post.headers.frameDeny=true"
-      - "traefik.http.middlewares.block-post.headers.browserXssFilter=true"
-      - "traefik.http.middlewares.block-post.headers.contentSecurityPolicy=default-src 'self'"
-      - "traefik.http.middlewares.block-post.headers.referrerPolicy=same-origin"
-      - "traefik.http.middlewares.block-post.headers.permissionsPolicy=interest-cohort=()"
-      - "traefik.http.middlewares.block-post.headers.featurePolicy=same-origin"
-      - "traefik.http.middlewares.block-post.headers.sslRedirect=true"
-      - "traefik.http.middlewares.block-post.headers.stsSeconds=63072000"
-      - "traefik.http.middlewares.block-post.headers.stsIncludeSubdomains=true"
-      - "traefik.http.middlewares.block-post.headers.stsPreload=true"
 
       # Routing for MinIO console
       - "traefik.http.routers.minio-console.rule=Host(`cdn.console.dennishilhorst.nl`)"
