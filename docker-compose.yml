@@ -20,6 +20,7 @@ services:
       - "traefik.http.routers.minio.rule=Host(`cdn.dennishilhorst.nl`)"
       - "traefik.http.routers.minio.middlewares=block-uploads@docker"
       - "traefik.http.routers.minio.entrypoints=websecure"
+      - "traefik.http.routers.minio.service=minio"
       - "traefik.http.routers.minio.tls.certresolver=myresolver"
       - "traefik.http.services.minio.loadbalancer.server.port=9000"
 
@@ -54,6 +55,7 @@ services:
       # Routing for MinIO console
       - "traefik.http.routers.minio-console.rule=Host(`cdn.console.dennishilhorst.nl`)"
       - "traefik.http.routers.minio-console.entrypoints=websecure"
+      - "traefik.http.routers.minio-console.service=minio-console"
       - "traefik.http.routers.minio-console.tls.certresolver=myresolver"
       - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
 volumes:
