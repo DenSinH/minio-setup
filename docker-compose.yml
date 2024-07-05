@@ -22,8 +22,9 @@ services:
       
       # Routing for image retrieval (GET requests)
       - "traefik.http.routers.minio.rule=Host(`cdn.dennishilhorst.nl`)"
-      - "traefik.http.routers.minio.entrypoints=websecure"
       - "traefik.http.routers.minio.middlewares=block-uploads@docker"
+      - "traefik.http.routers.minio.entrypoints=websecure"
+      - "traefik.http.routers.minio.tls.certresolver=myresolver"
       - "traefik.http.services.minio.loadbalancer.server.port=9000"
 
       # Middleware to block PUT requests (image uploads)
