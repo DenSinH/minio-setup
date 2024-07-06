@@ -17,7 +17,7 @@ services:
       - "traefik.enable=true"
       
       # Routing for image retrieval (GET requests)
-      - "traefik.http.routers.minio.rule=Host(`cdn.dennishilhorst.nl`) && Method(`GET`)"
+      - "traefik.http.routers.minio.rule=Host(`cdn.dennishilhorst.nl`)"
       - "traefik.http.routers.minio.entrypoints=websecure"
       - "traefik.http.routers.minio.service=minio"
       - "traefik.http.routers.minio.tls.certresolver=myresolver"
